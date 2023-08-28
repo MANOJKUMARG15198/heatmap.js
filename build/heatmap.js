@@ -171,6 +171,7 @@ var Store = (function StoreClosure() {
       this._min = data.min || 0;
       
       this._onExtremaChange();
+      console.log("renderall")
       this._coordinator.emit('renderall', this._getInternalData());
       return this;
     },
@@ -367,6 +368,7 @@ var Canvas2dRenderer = (function Canvas2dRendererClosure() {
     },
     renderAll: function(data) {
       // reset render boundaries
+      console.log("renderAll",_prepareData(data))
       this._clear();
       if (data.data.length > 0) {
         this._drawAlpha(_prepareData(data));
