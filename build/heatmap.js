@@ -54,6 +54,7 @@ var Store = (function StoreClosure() {
   Store.prototype = {
     // when forceRender = false -> called from setData, omits renderall event
     _organiseData: function(dataPoint, forceRender) {
+      console.log("_organiseData", dataPoint)
         var x = dataPoint[this._xField];
         var y = dataPoint[this._yField];
         var radi = this._radi;
