@@ -46,6 +46,7 @@ var Canvas2dRenderer = (function Canvas2dRendererClosure() {
   };
 
   var _prepareData = function(data) {
+    
     var renderData = [];
     var min = data.min;
     var max = data.max;
@@ -121,6 +122,7 @@ var Canvas2dRenderer = (function Canvas2dRendererClosure() {
       // reset render boundaries
       this._clear();
       if (data.data.length > 0) {
+        console.log("renderAll",_prepareData(data))
         this._drawAlpha(_prepareData(data));
         this._colorize();
       }
