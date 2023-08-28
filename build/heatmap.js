@@ -156,24 +156,24 @@ var Store = (function StoreClosure() {
       return this;
     },
     setData: function(data) {
-      var dataPoints = data.data;
-      var pointsLen = dataPoints.length;
+      // var dataPoints = data.data;
+      // var pointsLen = dataPoints.length;
 
 
-      // reset data arrays
-      this._data = [];
-      this._radi = [];
+      // // reset data arrays
+      // this._data = [];
+      // this._radi = [];
 
-      for(var i = 0; i < pointsLen; i++) {
-        this._organiseData(dataPoints[i], false);
-      }
-      this._max = data.max;
-      this._min = data.min || 0;
+      // for(var i = 0; i < pointsLen; i++) {
+      //   this._organiseData(dataPoints[i], false);
+      // }
+      // this._max = data.max;
+      // this._min = data.min || 0;
       
-      this._onExtremaChange();
-      console.log("renderall")
-      this._coordinator.emit('renderall', this._getInternalData());
-      return this;
+      // this._onExtremaChange();
+      // console.log("renderall")
+      // this._coordinator.emit('renderall', this._getInternalData());
+      // return this;
     },
     removeData: function() {
       // TODO: implement
