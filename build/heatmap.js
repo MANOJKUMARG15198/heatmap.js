@@ -18,6 +18,7 @@
   }
 
 })("h337", this, function () {
+  
 
 // Heatmap Config stores default values and will be merged with instance config
 var HeatmapConfig = {
@@ -30,20 +31,24 @@ var HeatmapConfig = {
   defaultXField: 'x',
   defaultYField: 'y',
   defaultValueField: 'value', 
+  defaultmaxiField: 'maxi',
   plugins: {}
 };
 var Store = (function StoreClosure() {
 
   var Store = function Store(config) {
+   
     this._coordinator = {};
     this._data = [];
     this._radi = [];
+    this._maxi=[]
     this._min = 10;
     this._max = 1;
     this._xField = config['xField'] || config.defaultXField;
     this._yField = config['yField'] || config.defaultYField;
     this._valueField = config['valueField'] || config.defaultValueField;
-
+    this._maxiField = config['maxiField'] || config.defaultmaxiField;
+  
     if (config["radius"]) {
       this._cfgRadius = config["radius"];
     }
@@ -54,7 +59,8 @@ var Store = (function StoreClosure() {
   Store.prototype = {
     // when forceRender = false -> called from setData, omits renderall event
     _organiseData: function(dataPoint, forceRender) {
-      console.log("_organiseData", dataPoint)
+      // console.log("Organisation",dataPoint);
+      // console.log("maxixradi",this._radi);
         var x = dataPoint[this._xField];
         var y = dataPoint[this._yField];
         var radi = this._radi;
@@ -62,21 +68,29 @@ var Store = (function StoreClosure() {
         var max = this._max;
         var min = this._min;
         var value = dataPoint[this._valueField] || 1;
+        var maxi=this._maxi;
+        var maxiv=dataPoint[this._maxiField] || this._max;
         var radius = dataPoint.radius || this._cfgRadius || defaultRadius;
-
+       
         if (!store[x]) {
           store[x] = [];
           radi[x] = [];
+           maxi[x] = [];
         }
-
+        // console.log("store1",store)
         if (!store[x][y]) {
           store[x][y] = value;
           radi[x][y] = radius;
+          maxi[x][y] = maxiv;
         } else {
+        
           store[x][y] += value;
+          console.log("else part",store)
         }
-        var storedVal = store[x][y];
 
+        // console.log("store2",store)
+        var storedVal = store[x][y];
+        // console.log("storeval",storedVal)
         if (storedVal > max) {
           if (!forceRender) {
             this._max = storedVal;
@@ -156,24 +170,24 @@ var Store = (function StoreClosure() {
       return this;
     },
     setData: function(data) {
-      // var dataPoints = data.data;
-      // var pointsLen = dataPoints.length;
+      var dataPoints = data.data;
+      var pointsLen = dataPoints.length;
 
 
-      // // reset data arrays
-      // this._data = [];
-      // this._radi = [];
+      // reset data arrays
+      this._data = [];
+      this._radi = [];
+      this._maxi = [];
 
-      // for(var i = 0; i < pointsLen; i++) {
-      //   this._organiseData(dataPoints[i], false);
-      // }
-      // this._max = data.max;
-      // this._min = data.min || 0;
+      for(var i = 0; i < pointsLen; i++) {
+        this._organiseData(dataPoints[i], false);
+      }
+      this._max = data.max;
+      this._min = data.min || 0;
       
-      // this._onExtremaChange();
-      // console.log("renderall")
-      // this._coordinator.emit('renderall', this._getInternalData());
-      // return this;
+      this._onExtremaChange();
+      this._coordinator.emit('renderall', this._getInternalData());
+      return this;
     },
     removeData: function() {
       // TODO: implement
@@ -198,7 +212,8 @@ var Store = (function StoreClosure() {
         max: this._max,
         min: this._min, 
         data: this._data,
-        radi: this._radi 
+        radi: this._radi,
+        maxi:this._maxi 
       };
     },
     getData: function() {
@@ -295,15 +310,17 @@ var Canvas2dRenderer = (function Canvas2dRendererClosure() {
   };
 
   var _prepareData = function(data) {
+ 
     var renderData = [];
     var min = data.min;
     var max = data.max;
     var radi = data.radi;
+    var maxi=data.maxi;
     var data = data.data;
-
+  
     var xValues = Object.keys(data);
     var xValuesLen = xValues.length;
-
+ 
     while(xValuesLen--) {
       var xValue = xValues[xValuesLen];
       var yValues = Object.keys(data[xValue]);
@@ -312,11 +329,14 @@ var Canvas2dRenderer = (function Canvas2dRendererClosure() {
         var yValue = yValues[yValuesLen];
         var value = data[xValue][yValue];
         var radius = radi[xValue][yValue];
+        var maxiv=maxi[xValue][yValue];
         renderData.push({
           x: xValue,
           y: yValue,
           value: value,
-          radius: radius
+          radius: radius,
+          maxi:maxiv
+          
         });
       }
     }
@@ -368,7 +388,7 @@ var Canvas2dRenderer = (function Canvas2dRendererClosure() {
     },
     renderAll: function(data) {
       // reset render boundaries
-      console.log("renderAll",_prepareData(data))
+      console.log("DataPR",_prepareData(data))
       this._clear();
       if (data.data.length > 0) {
         this._drawAlpha(_prepareData(data));
@@ -421,13 +441,15 @@ var Canvas2dRenderer = (function Canvas2dRendererClosure() {
       while(dataLen--) {
 
         var point = data[dataLen];
-
+        // calculate
+        // console.log("point",point);
         var x = point.x;
         var y = point.y;
         var radius = point.radius;
+        var maxi=point.maxi;
         // if value is bigger than max
         // use max as value
-        var value = Math.min(point.value, max);
+        var value = Math.min(point.value, maxi);
         var rectX = x - radius;
         var rectY = y - radius;
         var shadowCtx = this.shadowCtx;
@@ -443,10 +465,11 @@ var Canvas2dRenderer = (function Canvas2dRendererClosure() {
         }
         // value from minimum / value range
         // => [0, 1]
-        var templateAlpha = (value-min)/(max-min);
+        var templateAlpha = (value-min)/(maxi-min);
+       // console.log("hhhhhhhhhhhh",templateAlpha)
         // this fixes #176: small values are not visible because globalAlpha < .01 cannot be read from imageData
         shadowCtx.globalAlpha = templateAlpha < .01 ? .01 : templateAlpha;
-
+          //console.log("########",shadowCtx)
         shadowCtx.drawImage(tpl, rectX, rectY);
 
         // update renderBoundaries
@@ -491,6 +514,7 @@ var Canvas2dRenderer = (function Canvas2dRendererClosure() {
       }
 
       var img = this.shadowCtx.getImageData(x, y, width, height);
+     // console.log(img);
       var imgData = img.data;
       var len = imgData.length;
       var palette = this._palette;
