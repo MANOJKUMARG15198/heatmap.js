@@ -79,7 +79,8 @@ var Store = (function StoreClosure() {
             x: x,
             y: y,
             radius: radi[x][y],
-            value: data[x][y]
+            value: data[x][y],
+            maxi:maxi[x][y]
           });
 
         }

@@ -85,7 +85,7 @@ var Store = (function StoreClosure() {
         } else {
         
           store[x][y] += value;
-          console.log("else part",store)
+          // console.log("else part",store)
         }
 
         // console.log("store2",store)
@@ -184,7 +184,7 @@ var Store = (function StoreClosure() {
       }
       this._max = data.max;
       this._min = data.min || 0;
-      
+    
       this._onExtremaChange();
       this._coordinator.emit('renderall', this._getInternalData());
       return this;
@@ -388,7 +388,7 @@ var Canvas2dRenderer = (function Canvas2dRendererClosure() {
     },
     renderAll: function(data) {
       // reset render boundaries
-      console.log("DataPR",_prepareData(data))
+   
       this._clear();
       if (data.data.length > 0) {
         this._drawAlpha(_prepareData(data));
@@ -466,10 +466,7 @@ var Canvas2dRenderer = (function Canvas2dRendererClosure() {
         // value from minimum / value range
         // => [0, 1]
         var templateAlpha = (value-min)/(maxi-min);
-       // console.log("hhhhhhhhhhhh",templateAlpha)
-        // this fixes #176: small values are not visible because globalAlpha < .01 cannot be read from imageData
         shadowCtx.globalAlpha = templateAlpha < .01 ? .01 : templateAlpha;
-          //console.log("########",shadowCtx)
         shadowCtx.drawImage(tpl, rectX, rectY);
 
         // update renderBoundaries
@@ -551,9 +548,8 @@ var Canvas2dRenderer = (function Canvas2dRendererClosure() {
 
       }
 
-      img.data = imgData;
+      //img.data = imgData;
       this.ctx.putImageData(img, x, y);
-
       this._renderBoundaries = [1000, 1000, 0, 0];
 
     },
