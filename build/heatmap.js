@@ -1,11 +1,11 @@
-/*
- * heatmap.js v2.0.5 | JavaScript Heatmap Library
- *
- * Copyright 2008-2016 Patrick Wied <heatmapjs@patrick-wied.at> - All rights reserved.
- * Dual licensed under MIT and Beerware license 
- *
- * :: 2016-09-05 01:16
+/**
+ * @author MANOJ KUMAR G
+ * @email manojkumarg15198@gmail.com
+ * @create date 2023-08-30 17:57:41
+ * @modify date 2023-08-30 17:58:15
+ * @desc [description]
  */
+
 ;(function (name, context, factory) {
 
   // Supports UMD. AMD, CommonJS/Node.js and browser context
